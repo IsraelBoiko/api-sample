@@ -2,6 +2,7 @@ package com.ebanx
 
 import com.ebanx.persistence.configurePersistence
 import com.ebanx.plugins.*
+import com.ebanx.router._root.registerRouters
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
@@ -16,4 +17,5 @@ fun Application.module() {
   configureMonitoring()
   configureSerialization()
   configurePersistence()
+  registerRouters()
 }
