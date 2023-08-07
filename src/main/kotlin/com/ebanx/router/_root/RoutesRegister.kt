@@ -1,5 +1,6 @@
 package com.ebanx.router._root
 
+import com.ebanx.router.balance.registerBalanceRouters
 import io.ktor.server.application.*
 
 fun Application.registerRouters() {
@@ -8,4 +9,5 @@ fun Application.registerRouters() {
 
 fun Application.register() {
   registerResetRoute()
+  registerBalanceRouters()
 }
