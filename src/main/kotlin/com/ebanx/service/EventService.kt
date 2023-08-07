@@ -37,18 +37,12 @@ interface EventServiceTrait {
     }
   }
   
-  private suspend fun deposit(destination: String, amount: Long) = transaction {
-    mapOf(
-      "destination" to Account.findById(destination).opt({
-        it.balance += amount
-        
-        it
-      }, {
-        Account.new(destination) {
-          balance = amount
-        }
-      }).toModel()
-    )
+  private suspend fun deposit(destinationId: String, amount: Long) = transaction {
+    val destination = Account.findById(destinationId) ?: Account.new(destinationId) { balance = 0L }
+    
+    destination.balance += amount
+    
+    mapOf("destination" to destination.toModel())
   }
   
   private suspend fun withdraw(originId: String, amount: Long) = transaction {

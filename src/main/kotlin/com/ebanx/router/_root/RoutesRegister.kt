@@ -9,7 +9,7 @@ fun Application.registerRouters() {
 }
 
 fun Application.register() {
-  registerResetRoute()
+  registerResetRoutes()
   registerBalanceRouters()
   registerEventRouters()
 }
