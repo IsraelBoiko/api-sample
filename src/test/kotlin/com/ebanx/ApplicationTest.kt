@@ -19,7 +19,7 @@ class ApplicationTest {
   fun `Reset state before starting tests`() = testApplication {
     application { module() }
     
-    client.get("/reset").apply {
+    client.post("/reset").apply {
       assertEquals(HttpStatusCode.OK, status)
       assertEquals("OK", bodyAsText())
     }
@@ -222,7 +222,7 @@ class ApplicationTest {
     }
     
     // when
-    client.get("/reset").apply {
+    client.post("/reset").apply {
       assertEquals(HttpStatusCode.OK, status)
       assertEquals("OK", bodyAsText())
     }

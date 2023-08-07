@@ -9,7 +9,7 @@ import io.ktor.server.routing.*
 fun Application.registerResetRoutes() {
   routing {
     route("/reset") {
-      get {
+      post {
         ResetService.execute()
         call.respond(HttpStatusCode.OK, "OK")
       }
