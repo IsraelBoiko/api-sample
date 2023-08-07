@@ -150,4 +150,58 @@ class ApplicationTest {
       assertEquals("{\"origin\":{\"id\":\"100\",\"balance\":15}}", bodyAsText())
     }
   }
+  
+  @Test
+  @Order(8)
+  fun `Transfer from existing account`() = testApplication {
+    application { module() }
+    
+    val client = createClient {
+      install(ContentNegotiation) {
+        json()
+      }
+    }
+    
+    client.post("/event") {
+      contentType(ContentType.Application.Json)
+      setBody(
+        EventModel(
+          type = EventType.Transfer,
+          origin = "100",
+          amount = 15L,
+          destination = "300"
+        )
+      )
+    }.apply {
+      assertEquals(HttpStatusCode.Created, status)
+      assertEquals("{\"origin\":{\"id\":\"100\",\"balance\":0},\"destination\":{\"id\":\"300\",\"balance\":15}}", bodyAsText())
+    }
+  }
+  
+  @Test
+  @Order(9)
+  fun `Transfer from non-existing account`() = testApplication {
+    application { module() }
+    
+    val client = createClient {
+      install(ContentNegotiation) {
+        json()
+      }
+    }
+    
+    client.post("/event") {
+      contentType(ContentType.Application.Json)
+      setBody(
+        EventModel(
+          type = EventType.Transfer,
+          origin = "200",
+          amount = 15L,
+          destination = "300"
+        )
+      )
+    }.apply {
+      assertEquals(HttpStatusCode.NotFound, status)
+      assertEquals("0", bodyAsText())
+    }
+  }
 }

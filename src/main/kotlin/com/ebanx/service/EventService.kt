@@ -8,8 +8,12 @@ import kotlinx.serialization.*
 enum class EventType {
   @SerialName("deposit")
   Deposit,
+  
   @SerialName("withdraw")
   Withdraw,
+  
+  @SerialName("transfer")
+  Transfer,
 }
 
 @Serializable
@@ -27,6 +31,9 @@ interface EventServiceTrait {
       
       EventType.Withdraw ->
         withdraw(model.origin ?: throwBadRequest(), model.amount)
+      
+      EventType.Transfer ->
+        transfer(model.origin ?: throwBadRequest(), model.destination ?: throwBadRequest(), model.amount)
     }
   }
   
@@ -50,5 +57,18 @@ interface EventServiceTrait {
     origin.balance -= amount
     
     mapOf("origin" to origin.toModel())
+  }
+  
+  private suspend fun transfer(originId: String, destinationId: String, amount: Long) = transaction {
+    val origin = Account.findById(originId) ?: throwNotFound()
+    val destination = Account.findById(destinationId) ?: Account.new(destinationId) { balance = 0L }
+    
+    origin.balance -= amount
+    destination.balance += amount
+    
+    mapOf(
+      "origin" to origin.toModel(),
+      "destination" to destination.toModel(),
+    )
   }
 }
