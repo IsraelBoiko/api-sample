@@ -1,5 +1,6 @@
 package com.ebanx.service
 
+import com.ebanx.core.opt
 import com.ebanx.persistence.*
 import kotlinx.serialization.*
 
@@ -25,8 +26,16 @@ interface EventServiceTrait {
   }
   
   private suspend fun deposit(destination: String, amount: Long) = transaction {
-    mapOf("destination" to Account.new(destination) {
-      balance = amount
-    }.toModel())
+    mapOf(
+      "destination" to Account.findById(destination).opt({
+        it.balance += amount
+        
+        it
+      }, {
+        Account.new(destination) {
+          balance = amount
+        }
+      }).toModel()
+    )
   }
 }

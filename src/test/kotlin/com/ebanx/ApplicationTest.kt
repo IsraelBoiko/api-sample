@@ -54,4 +54,29 @@ class ApplicationTest {
       assertEquals("{\"destination\":{\"id\":\"100\",\"balance\":10}}", bodyAsText())
     }
   }
+  
+  @Test
+  fun `Deposit into existing account`() = testApplication {
+    application { module() }
+    
+    val client = createClient {
+      install(ContentNegotiation) {
+        json()
+      }
+    }
+    
+    client.post("/event") {
+      contentType(ContentType.Application.Json)
+      setBody(
+        EventModel(
+          type = EventType.Deposit,
+          destination = "100",
+          amount = 10L
+        )
+      )
+    }.apply {
+      assertEquals(HttpStatusCode.Created, status)
+      assertEquals("{\"destination\":{\"id\":\"100\",\"balance\":20}}", bodyAsText())
+    }
+  }
 }
