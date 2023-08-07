@@ -17,5 +17,6 @@ fun Application.module() {
   configureMonitoring()
   configureSerialization()
   configurePersistence()
+  configureStatusPages()
   registerRouters()
 }

@@ -4,6 +4,7 @@ val logback_version: String by project
 
 val exposed_version: String by project
 val h2_version: String by project
+val junit_version: String by project
 
 plugins {
   kotlin("jvm") version "1.9.0"
@@ -34,6 +35,7 @@ dependencies {
   implementation("io.ktor:ktor-server-call-id-jvm")
   implementation("io.ktor:ktor-server-content-negotiation-jvm")
   implementation("io.ktor:ktor-serialization-kotlinx-json-jvm")
+  implementation("io.ktor:ktor-server-status-pages")
   implementation("org.jetbrains.exposed:exposed-core:$exposed_version")
   implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
   implementation("org.jetbrains.exposed:exposed-dao:$exposed_version")
@@ -42,5 +44,9 @@ dependencies {
   implementation("ch.qos.logback:logback-classic:$logback_version")
   testImplementation("io.ktor:ktor-server-tests-jvm")
   testImplementation("io.ktor:ktor-client-content-negotiation-jvm")
-  testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+  testImplementation(kotlin("test"))
+}
+
+tasks.test {
+  useJUnitPlatform()
 }
