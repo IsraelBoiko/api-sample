@@ -98,4 +98,30 @@ class ApplicationTest {
       assertEquals("20", bodyAsText())
     }
   }
+  
+  @Test
+  @Order(6)
+  fun `Withdraw from non-existing account`() = testApplication {
+    application { module() }
+    
+    val client = createClient {
+      install(ContentNegotiation) {
+        json()
+      }
+    }
+    
+    client.post("/event") {
+      contentType(ContentType.Application.Json)
+      setBody(
+        EventModel(
+          type = EventType.Withdraw,
+          origin = "200",
+          amount = 10L
+        )
+      )
+    }.apply {
+      assertEquals(HttpStatusCode.NotFound, status)
+      assertEquals("0", bodyAsText())
+    }
+  }
 }
