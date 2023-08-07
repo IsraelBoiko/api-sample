@@ -124,4 +124,30 @@ class ApplicationTest {
       assertEquals("0", bodyAsText())
     }
   }
+  
+  @Test
+  @Order(7)
+  fun `Withdraw from existing account`() = testApplication {
+    application { module() }
+    
+    val client = createClient {
+      install(ContentNegotiation) {
+        json()
+      }
+    }
+    
+    client.post("/event") {
+      contentType(ContentType.Application.Json)
+      setBody(
+        EventModel(
+          type = EventType.Withdraw,
+          origin = "100",
+          amount = 5L
+        )
+      )
+    }.apply {
+      assertEquals(HttpStatusCode.Created, status)
+      assertEquals("{\"origin\":{\"id\":\"100\",\"balance\":15}}", bodyAsText())
+    }
+  }
 }

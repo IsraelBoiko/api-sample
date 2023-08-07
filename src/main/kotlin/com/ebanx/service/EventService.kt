@@ -26,7 +26,7 @@ interface EventServiceTrait {
         deposit(model.destination ?: throwBadRequest(), model.amount)
       
       EventType.Withdraw ->
-        throwNotFound()
+        withdraw(model.origin ?: throwBadRequest(), model.amount)
     }
   }
   
@@ -42,5 +42,13 @@ interface EventServiceTrait {
         }
       }).toModel()
     )
+  }
+  
+  private suspend fun withdraw(originId: String, amount: Long) = transaction {
+    val origin = Account.findById(originId) ?: throwNotFound()
+    
+    origin.balance -= amount
+    
+    mapOf("origin" to origin.toModel())
   }
 }
