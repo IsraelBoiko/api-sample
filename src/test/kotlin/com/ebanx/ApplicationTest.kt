@@ -204,4 +204,39 @@ class ApplicationTest {
       assertEquals("0", bodyAsText())
     }
   }
+  
+  @Test
+  @Order(10)
+  fun `Reset state after tests`() = testApplication {
+    application { module() }
+    
+    // given
+    client.get("/balance?account_id=100").apply {
+      assertEquals(HttpStatusCode.OK, status)
+      assertEquals("0", bodyAsText())
+    }
+    
+    client.get("/balance?account_id=300").apply {
+      assertEquals(HttpStatusCode.OK, status)
+      assertEquals("15", bodyAsText())
+    }
+    
+    // when
+    client.get("/reset").apply {
+      assertEquals(HttpStatusCode.OK, status)
+      assertEquals("OK", bodyAsText())
+    }
+    
+    // then
+    client.get("/balance?account_id=100").apply {
+      assertEquals(HttpStatusCode.NotFound, status)
+      assertEquals("0", bodyAsText())
+    }
+    
+    client.get("/balance?account_id=300").apply {
+      assertEquals(HttpStatusCode.NotFound, status)
+      assertEquals("0", bodyAsText())
+    }
+  }
+  
 }
