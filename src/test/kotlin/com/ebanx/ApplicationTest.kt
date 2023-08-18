@@ -207,13 +207,65 @@ class ApplicationTest {
   
   @Test
   @Order(10)
+  fun `Withdraw from existing account Negative`() = testApplication {
+    application { module() }
+    
+    val client = createClient {
+      install(ContentNegotiation) {
+        json()
+      }
+    }
+    
+    client.post("/event") {
+      contentType(ContentType.Application.Json)
+      setBody(
+        EventModel(
+          type = EventType.Withdraw,
+          origin = "100",
+          amount = 100L
+        )
+      )
+    }.apply {
+      assertEquals(HttpStatusCode.Created, status)
+      assertEquals("{\"origin\":{\"id\":\"100\",\"balance\":-100}}", bodyAsText())
+    }
+  }
+  
+  @Test
+  @Order(11)
+  fun `Withdraw from existing account Over balance`() = testApplication {
+    application { module() }
+    
+    val client = createClient {
+      install(ContentNegotiation) {
+        json()
+      }
+    }
+    
+    client.post("/event") {
+      contentType(ContentType.Application.Json)
+      setBody(
+        EventModel(
+          type = EventType.Withdraw,
+          origin = "100",
+          amount = 51L
+        )
+      )
+    }.apply {
+      assertEquals(HttpStatusCode.NotFound, status)
+      assertEquals("0", bodyAsText())
+    }
+  }
+  
+  @Test
+  @Order(12)
   fun `Reset state after tests`() = testApplication {
     application { module() }
     
     // given
     client.get("/balance?account_id=100").apply {
       assertEquals(HttpStatusCode.OK, status)
-      assertEquals("0", bodyAsText())
+      assertEquals("-100", bodyAsText())
     }
     
     client.get("/balance?account_id=300").apply {
@@ -238,5 +290,4 @@ class ApplicationTest {
       assertEquals("0", bodyAsText())
     }
   }
-  
 }

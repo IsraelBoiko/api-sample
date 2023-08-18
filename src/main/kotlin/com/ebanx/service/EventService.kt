@@ -20,10 +20,14 @@ enum class EventType {
 data class EventModel(val type: EventType, val origin: String? = null, val destination: String? = null, val amount: Long)
 
 class EventService {
-  companion object : EventServiceTrait
+  companion object : EventServiceTrait {
+    override val limit = -150L
+  }
 }
 
 interface EventServiceTrait {
+  val limit: Long
+  
   suspend fun register(model: EventModel) = run {
     when (model.type) {
       EventType.Deposit ->
@@ -47,6 +51,8 @@ interface EventServiceTrait {
   
   private suspend fun withdraw(originId: String, amount: Long) = transaction {
     val origin = Account.findById(originId) ?: throwNotFound()
+    
+    if (origin.balance - amount <= limit) throwNotFound()
     
     origin.balance -= amount
     
